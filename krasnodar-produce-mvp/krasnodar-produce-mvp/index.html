@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173d2c">
+  <meta name="description" content="Предварительный каталог доставки фруктов и овощей по Краснодару.">
+  <title>Зелёная корзина — доставка продуктов</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Зелёная корзина — главная">
+      <span class="brand-mark">ЗК</span>
+      <span><strong>Зелёная корзина</strong><small>Краснодар · каталог на тестировании</small></span>
+    </a>
+    <button class="cart-trigger" id="open-cart" type="button" aria-label="Открыть корзину">
+      Корзина <span id="cart-count" class="cart-count">0</span>
+    </button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">ФРУКТЫ И ОВОЩИ С ДОСТАВКОЙ</span>
+        <h1>Свежие продукты.<br><em>Заказ без лишних шагов.</em></h1>
+        <p>Выберите продукты, отправьте заявку — мы подтвердим наличие, итоговую стоимость и возможность доставки.</p>
+        <div class="hero-note">Цены предварительные. Приём реальных заказов отключён до настройки базы данных и Telegram.</div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="produce-circle circle-one">🍊</div>
+        <div class="produce-circle circle-two">🍎</div>
+        <div class="produce-circle circle-three">🥬</div>
+        <div class="produce-circle circle-four">🥕</div>
+        <div class="produce-bag">FRESH<br><span>LOCAL</span></div>
+      </div>
+    </section>
+
+    <section class="catalog-section">
+      <div class="section-heading">
+        <div><span class="eyebrow">НАШ АССОРТИМЕНТ</span><h2>Каталог продуктов</h2></div>
+        <label class="search-wrap"><span class="sr-only">Поиск товаров</span><input id="search" type="search" placeholder="Найти товар…"></label>
+      </div>
+      <div class="category-tabs" id="category-tabs" aria-label="Категории">
+        <button class="category-tab active" data-category="all">Все товары</button>
+        <button class="category-tab" data-category="fruit">Фрукты</button>
+        <button class="category-tab" data-category="vegetable">Овощи</button>
+        <button class="category-tab" data-category="greens">Зелень</button>
+      </div>
+      <div id="catalog" class="product-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="delivery-strip">
+      <div><span class="strip-icon">↗</span><div><strong>Доставка по запросу</strong><p>Стоимость зависит от адреса и доступности курьера.</p></div></div>
+      <div><span class="strip-icon">✓</span><div><strong>Подтверждаем заказ вручную</strong><p>Проверяем наличие и финальную сумму до закупки.</p></div></div>
+    </section>
+  </main>
+
+  <footer><span>Зелёная корзина · тестовый MVP</span><span>Цены и наличие требуют подтверждения</span></footer>
+
+  <div id="overlay" class="overlay hidden"></div>
+  <aside id="cart-drawer" class="cart-drawer" aria-label="Корзина" aria-hidden="true">
+    <div class="drawer-header"><div><span class="eyebrow">ВАШ ЗАКАЗ</span><h2>Корзина</h2></div><button id="close-cart" class="icon-button" aria-label="Закрыть корзину">×</button></div>
+    <div id="cart-items" class="cart-items"></div>
+    <div id="cart-empty" class="empty-state"><span>🧺</span><strong>Пока пусто</strong><p>Добавьте продукты из каталога.</p></div>
+    <div class="cart-summary">
+      <div class="summary-line"><span>Товары (предварительно)</span><strong id="cart-subtotal">0 ₽</strong></div>
+      <div class="summary-line muted"><span>Доставка</span><span>Подтвердим отдельно</span></div>
+      <button id="checkout-button" class="primary-button full-width" disabled>Перейти к оформлению</button>
+      <p class="fine-print">Сумма предварительная. Заказ не будет отправлен, пока администратор не включит приём заказов.</p>
+    </div>
+  </aside>
+
+  <div id="checkout-modal" class="modal-shell hidden" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+    <div class="modal-card">
+      <div class="drawer-header"><div><span class="eyebrow">ПОСЛЕДНИЙ ШАГ</span><h2 id="checkout-title">Данные для заказа</h2></div><button id="close-checkout" class="icon-button" aria-label="Закрыть">×</button></div>
+      <div class="demo-warning">Демо-режим: форма проверяется в браузере, реальные заказы отключены.</div>
+      <form id="checkout-form">
+        <label>Ваше имя<input name="name" autocomplete="name" required maxlength="80" placeholder="Как к вам обращаться"></label>
+        <label>Телефон<input name="phone" autocomplete="tel" required maxlength="30" placeholder="+7 900 000-00-00"></label>
+        <label>Адрес доставки<textarea name="address" required maxlength="500" rows="2" placeholder="Улица, дом, подъезд, этаж"></textarea></label>
+        <label>Комментарий (необязательно)<textarea name="note" maxlength="500" rows="2" placeholder="Домофон, пожелания к продуктам"></textarea></label>
+        <label class="consent"><input type="checkbox" name="consent" required> Я согласен(на) на обработку данных для обработки заявки после запуска сервиса.</label>
+        <button class="primary-button full-width" type="submit">Проверить заявку в демо-режиме</button>
+        <p class="fine-print">Не вводите реальные персональные данные в демонстрационной версии.</p>
+      </form>
+      <div id="form-result" class="form-result hidden" role="status"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
