@@ -45,14 +45,66 @@ $("search").addEventListener("input",e=>{state.search=e.target.value.trim();rend
 $("open-cart").addEventListener("click",openCart);$("close-cart").addEventListener("click",closeCart);$("overlay").addEventListener("click",closeCart);
 $("checkout-button").addEventListener("click",openCheckout);$("close-checkout").addEventListener("click",closeCheckout);
 $("checkout-modal").addEventListener("click",e=>{if(e.target===$("checkout-modal"))closeCheckout();});
-$("checkout-form").addEventListener("submit",async e=>{
+
+$("checkout-form").addEventListener("submit", async e => {
   e.preventDefault();
-  const form=e.currentTarget;
-  if(!form.reportValidity())return;
-  const lines=cartLines();
-  if(!lines.length)return;
-  // Безопасный режим по умолчанию: заявка не отправляется, персональные данные не сохраняются и не уходят на сервер.
-  $("form-result").innerHTML="<strong>Демо-проверка пройдена.</strong><br>Форма заполнена корректно, но реальный заказ не создан и данные никуда не отправлены. Для запуска настройте серверную функцию, базу данных и Telegram по README.";
-  $("form-result").classList.remove("hidden");
+
+  const form = e.currentTarget;
+  if (!form.reportValidity()) return;
+
+  const lines = cartLines();
+  if (!lines.length) return;
+
+  const button = form.querySelector('button[type="submit"]');
+  const result = $("form-result");
+
+  button.disabled = true;
+  button.textContent = "Отправка...";
+  result.classList.add("hidden");
+
+  try {
+    const response = await fetch(
+      "/.netlify/functions/create-order",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.elements.name.value.trim(),
+          phone: form.elements.phone.value.trim(),
+          address: form.elements.address.value.trim(),
+          note: form.elements.note.value.trim(),
+          items: lines.map(({ product, qty }) => ({
+            productId: product.id,
+            quantity: qty
+          }))
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Ошибка отправки заказа");
+    }
+
+    result.textContent = data.message || data.warning ||
+      "Заявка обработана.";
+    result.classList.remove("hidden");
+
+    if (response.status === 201) {
+      state.cart = {};
+      saveCart();
+      renderCart();
+      form.reset();
+    }
+  } catch (error) {
+    result.textContent =
+      error.message || "Не удалось связаться с сервером.";
+    result.classList.remove("hidden");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Проверить заявку в демо-режиме";
+  }
+
 });
 renderCatalog();renderCart();
